@@ -8,7 +8,9 @@ const Product = ({product}) => {
     <div className="product" style={{marginBottom: "20px"}}>
       <div style={{width: "300px", height: "300px"}}>
       <Link to={`/products/${product.id}`}>
-        <img src={`http://localhost:8080/${product.images[0].filePath}`} alt={product.title} style={{objectFit: "contain", objectPosition: "center", width: "80%", height: "250px", margin: "0 auto"}} />
+      {
+        product.images && product.images.length > 0 ? <img src={`http://localhost:8080/${product?.images[0]?.filePath}`} alt={product.title} style={{objectFit: "contain", objectPosition: "center", width: "80%", height: "250px", margin: "0 auto"}} /> : <img src="https://t4.ftcdn.net/jpg/04/99/93/31/360_F_499933117_ZAUBfv3P1HEOsZDrnkbNCt4jc3AodArl.jpg" alt={product.title} style={{objectFit: "contain", objectPosition: "center", width: "80%", height: "250px", margin: "0 auto"}} />
+      }
       </Link>
       </div>
       <div className="product-info">

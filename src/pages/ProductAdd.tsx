@@ -40,21 +40,26 @@ const ProductAdd = ({}) => {
 
   const addProductHandler = async (e) => {
     e.preventDefault();
-    console.log(input);
-    console.log(selectedFiles);
     const formData = new FormData();
     formData.append("title", title);
     formData.append("price", price);
     formData.append("category", category);
-    selectedFiles.forEach((file) => {
-      formData.append("files", file);
-    });
+    if (selectedFiles && selectedFiles.length > 0) {
+      selectedFiles.forEach((file) => {
+        formData.append("files", file);
+      });
+    } else {
+      formData.append("files", new Blob([]));
+    }
+
     const res = await api.post(`/saveProduct`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
-    console.log(res);
+    if (res.status == 200) {
+      navigate("/products");
+    }
   };
 
   return (

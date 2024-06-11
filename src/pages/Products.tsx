@@ -1,28 +1,19 @@
-import React, { createRef, useEffect, useState } from "react";
-import p1 from "../assets/p1.png";
-import p2 from "../assets/p2.png";
-import p3 from "../assets/p3.png";
-import p4 from "../assets/p4.png";
+import React, { useEffect, useState } from "react";
 import Product from "../components/Product";
-import Button from "./Button";
-import AddProduct from "../components/AddProduct";
 import { Link } from "react-router-dom";
-import { addProduct, getAllProducts } from "../api/productApi";
+import { getAllProducts } from "../api/productApi";
 import { FaPlus } from "react-icons/fa6";
-import { api } from "../config/axios";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
 
-  const getAllProducts = async () => {
-    const res = await api.get('/all-products');
-    setProducts(res.data);  
+  const getAllProductsHandler = async () => {
+    const data = await getAllProducts();
+    setProducts(data);  
   }
 
   useEffect(() => {
-    console.log(products);
-    
-    getAllProducts();
+    getAllProductsHandler();
   }, [])
 
   return (
