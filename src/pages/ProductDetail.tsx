@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { deleteProductById, getSingleProduct } from "../api/productApi";
 import { IoStarSharp } from "react-icons/io5";
 import { FaCartPlus } from "react-icons/fa";
@@ -131,21 +131,23 @@ const ProductDetail = () => {
                 ${product?.price}
               </h4>
               <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                  style={{
-                    backgroundColor: "#363caf",
-                    color: "white",
-                    border: 0,
-                    borderRadius: "5px",
-                    padding: "10px 20px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Edit
-                </button>
+                <Link to={`/edit-product/${id}`}>
+                  <button
+                    style={{
+                      backgroundColor: "#363caf",
+                      color: "white",
+                      border: 0,
+                      borderRadius: "5px",
+                      padding: "10px 20px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Edit
+                  </button>
+                </Link>
                 <button
                   onClick={() => deleteProductHandler(product.id)}
                   style={{

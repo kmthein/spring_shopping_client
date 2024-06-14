@@ -1,13 +1,37 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button";
 import { api } from "../config/axios";
 import { useEffect, useState } from "react";
+import { getSingleProduct } from "../api/productApi";
+import { MdDeleteForever } from "react-icons/md";
 
-const ProductAdd = ({}) => {
+const ProductForm = ({ editMode }) => {
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState([]);
+  const { id: pId } = useParams();
 
+  const [oldProduct, setOldProduct] = useState({});
+
+  const initialInput = {
+    title: "",
+    price: "",
+    category: "",
+  };
+
+  const getOldProductDetail = async () => {
+    const data = await getSingleProduct(pId);
+    console.log(data);
+
+    setInput({
+      ...input,
+      title: data.title,
+      price: data.price,
+      category: data.category.id,
+    });
+    setOldProduct({ ...oldProduct, images: data.images, id: data.id });
+  };
+
+  const [categories, setCategories] = useState([]);
   const getAllCategories = async () => {
     const res = await api.get(`/all-category`);
     setCategories(res.data);
@@ -17,19 +41,19 @@ const ProductAdd = ({}) => {
     getAllCategories();
   }, []);
 
-  const initialInput = {
-    title: "",
-    price: "",
-    category: "",
-  };
-
   const [input, setInput] = useState(initialInput);
+
+  useEffect(() => {
+    if (editMode) {
+      getOldProductDetail();
+    }
+  }, []);
 
   const inputChangeHandler = (e) => {
     setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const { title, price, category } = input;
+  const { id, title, price, category } = input;
 
   const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -38,27 +62,54 @@ const ProductAdd = ({}) => {
     setSelectedFiles(files);
   };
 
-  const addProductHandler = async (e) => {
+  const deleteImageHandler = (id) => {
+    const filterImage = oldProduct.images.filter((img) => img.id != id);
+    setOldProduct({ ...oldProduct, images: filterImage });
+  };
+
+  console.log(oldProduct.images);
+
+  const productSubmitHandler = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", title);
     formData.append("price", price);
     formData.append("category", category);
-    if (selectedFiles && selectedFiles.length > 0) {
-      selectedFiles.forEach((file) => {
-        formData.append("files", file);
-      });
-    } else {
-      formData.append("files", new Blob([]));
-    }
-
-    const res = await api.post(`/saveProduct`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    if (!editMode) {
+      if (selectedFiles && selectedFiles.length > 0) {
+        selectedFiles.forEach((file) => {
+          formData.append("files", file);
+        });
+      } else {
+        formData.append("files", new Blob([]));
       }
-    })
-    if (res.status == 200) {
-      navigate("/products");
+    } else {
+      formData.append("id", oldProduct.id);
+      formData.append("category", category);
+      if (oldProduct.images.length > 0) {
+        oldProduct.images.forEach((img) => {
+          formData.append("existingImgIds", img.id);
+        });
+      }
+      if (selectedFiles.length > 0) {
+        selectedFiles.forEach((file) => {
+          formData.append("files", file);
+        });
+      } else {
+        formData.append("files", new Blob([]));
+      }
+    }
+    try {
+      const res = await api.post(`/saveProduct`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (res.status == 200) {
+        navigate("/products");
+      }
+    } catch (error) {
+      console.error("Something went wrong: ", error);
     }
   };
 
@@ -75,14 +126,14 @@ const ProductAdd = ({}) => {
     >
       <form
         style={{ width: "100%" }}
-        onSubmit={addProductHandler}
+        onSubmit={productSubmitHandler}
         encType="multipart/form-data"
         method="post"
       >
         <div style={{ width: "70%", margin: "0 auto" }}>
           <div>
             <h3 className="title" style={{ textAlign: "center" }}>
-              Add Product
+              {editMode ? "Edit" : "Create"} Product
             </h3>
             <label htmlFor="name">Name</label>
             <input
@@ -117,6 +168,33 @@ const ProductAdd = ({}) => {
           </div>
           <div>
             <label htmlFor="image">Image</label>
+            {editMode && oldProduct?.images?.length > 0 && (
+              <div style={{ display: "flex", gap: "20px" }}>
+                {oldProduct.images.map((img) => (
+                  <div style={{ position: "relative" }}>
+                    <img
+                      src={`http://localhost:8080/${img.filePath}`}
+                      alt={img.fileName}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                      }}
+                    />
+                    <MdDeleteForever
+                      onClick={() => deleteImageHandler(img.id)}
+                      style={{
+                        color: "red",
+                        position: "absolute",
+                        right: 0,
+                        cursor: "pointer",
+                        fontSize: "20px",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
             <input
               type="file"
               onChange={handleFileChange}
@@ -145,7 +223,8 @@ const ProductAdd = ({}) => {
                 border: "1px solid #c9c9c9",
               }}
             >
-              <option value="">Select One Category</option>
+              {!editMode && <option value="">Select One Category</option>}
+
               {categories &&
                 categories.length > 0 &&
                 categories.map((cat) => (
@@ -185,4 +264,4 @@ const ProductAdd = ({}) => {
   );
 };
 
-export default ProductAdd;
+export default ProductForm;

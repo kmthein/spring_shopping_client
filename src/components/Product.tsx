@@ -2,20 +2,49 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { IoStarSharp } from "react-icons/io5";
 
-const Product = ({product}) => {
-  
+const Product = ({ product }) => {
   return (
-    <div className="product" style={{marginBottom: "20px"}}>
-      <div style={{width: "300px", height: "300px"}}>
-      <Link to={`/products/${product.id}`}>
-      {
-        product.images && product.images.length > 0 ? <img src={`http://localhost:8080/${product?.images[0]?.filePath}`} alt={product.title} style={{objectFit: "contain", objectPosition: "center", width: "80%", height: "250px", margin: "0 auto"}} /> : <img src="https://t4.ftcdn.net/jpg/04/99/93/31/360_F_499933117_ZAUBfv3P1HEOsZDrnkbNCt4jc3AodArl.jpg" alt={product.title} style={{objectFit: "contain", objectPosition: "center", width: "80%", height: "250px", margin: "0 auto"}} />
-      }
-      </Link>
+    <div className="product" style={{ marginBottom: "20px" }}>
+      <div style={{ width: "300px", height: "300px" }}>
+        <Link to={`/products/${product.id}`}>
+          {product.images && product.images.length > 0 ? (
+            <img
+              src={`http://localhost:8080/${product?.images[0]?.filePath}`}
+              alt={product.title}
+              style={{
+                objectFit: "contain",
+                objectPosition: "center",
+                width: "80%",
+                height: "250px",
+                margin: "0 auto",
+              }}
+            />
+          ) : (
+            <img
+              src="https://t4.ftcdn.net/jpg/04/99/93/31/360_F_499933117_ZAUBfv3P1HEOsZDrnkbNCt4jc3AodArl.jpg"
+              alt={product.title}
+              style={{
+                objectFit: "contain",
+                objectPosition: "center",
+                width: "80%",
+                height: "250px",
+                margin: "0 auto",
+              }}
+            />
+          )}
+        </Link>
       </div>
       <div className="product-info">
-        <h3 style={{ fontSize: "18px", fontWeight: 600, margin: "10px 0", lineHeight: "1.5" }}>
-          {product.title.slice(0, 30)}{product.title.length > 30 && "..."}
+        <h3
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            margin: "10px 0",
+            lineHeight: "1.5",
+          }}
+        >
+          {product.title.slice(0, 30)}
+          {product.title.length > 30 && "..."}
         </h3>
         {/* <div>
           <span>
